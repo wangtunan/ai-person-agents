@@ -14,7 +14,7 @@ export function fetchReadableStreamBody(
       if (!res.ok) {
         const hint =
           res.status === 502 || res.status === 503
-            ? "（请确认 BACKEND_ORIGIN 指向的后端已启动）"
+            ? "（请确认 NEXT_PUBLIC_API_BASE_URL 对应的后端已启动）"
             : "";
         throw new Error(`请求失败 HTTP ${res.status}${hint}`);
       }
@@ -26,7 +26,7 @@ export function fetchReadableStreamBody(
     .catch((e: unknown) => {
       if (e instanceof TypeError) {
         throw new Error(
-          "无法连接后端。若使用本地服务，请启动后端进程；本地开发可将 NEXT_PUBLIC_API_BASE_URL 留空并配置 BACKEND_ORIGIN，由 Next 转发 /api。",
+          "无法连接后端。请确认后端已启动，且 NEXT_PUBLIC_API_BASE_URL 指向正确的 API 地址。",
         );
       }
       throw e;

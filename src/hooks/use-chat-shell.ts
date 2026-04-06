@@ -72,7 +72,11 @@ export function useChatShell() {
     setDraft("");
     setLoading(true);
 
-    if (activeAgentId === "weather" || activeAgentId === "vsix") {
+    if (
+      activeAgentId === "weather" ||
+      activeAgentId === "vsix" ||
+      activeAgentId === "translate"
+    ) {
       const assistantId = crypto.randomUUID();
       const assistantTurn: ChatTurn = {
         id: assistantId,
@@ -91,7 +95,9 @@ export function useChatShell() {
         getStreamBody:
           activeAgentId === "weather"
             ? () => api.weatherStream(text)
-            : () => api.vsixStream(text),
+            : activeAgentId === "vsix"
+              ? () => api.vsixStream(text)
+              : () => api.translateStream(text),
       });
       return;
     }

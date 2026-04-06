@@ -18,6 +18,14 @@ export const AGENTS: AgentDef[] = [
     allowEmptySend: false,
   },
   {
+    id: "translate",
+    name: "translate",
+    description: "文本翻译（流式输出）",
+    hint: "输入要翻译的原文，发送后由后端流式返回译文",
+    inputPlaceholder: "输入原文…",
+    allowEmptySend: false,
+  },
+  {
     id: "health",
     name: "health",
     description: "服务健康检查",

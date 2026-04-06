@@ -12,6 +12,8 @@ export async function callAgentApi(
       return api.weather(input);
     case "vsix":
       return api.vsix(input);
+    case "translate":
+      return api.translateStream(input);
     default: {
       const _exhaustive: never = agentId;
       return _exhaustive;

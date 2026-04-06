@@ -1,4 +1,5 @@
 import { getHealth } from "./health";
+import { postTranslateStream } from "./translate";
 import { getWeather, getWeatherStream } from "./weather";
 import { postVsix, postVsixStream } from "./vsix";
 
@@ -9,4 +10,5 @@ export const api = {
   weatherStream: getWeatherStream,
   vsix: postVsix,
   vsixStream: postVsixStream,
+  translateStream: postTranslateStream,
 };
