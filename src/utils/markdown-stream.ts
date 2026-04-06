@@ -1,4 +1,4 @@
-import type { WeatherStreamChunk } from "@/types/weather";
+import type { MarkdownStreamChunk } from "@/types/markdown-stream";
 
 type ForecastRow = { date: string; temp: number; weather: string };
 
@@ -14,9 +14,9 @@ function formatForecastMarkdown(city: string, rows: ForecastRow[]): string {
   return `${title}${table}\n\n`;
 }
 
-export function foldWeatherChunk(
+export function foldMarkdownStreamChunk(
   acc: string,
-  chunk: WeatherStreamChunk,
+  chunk: MarkdownStreamChunk,
 ): string {
   switch (chunk.type) {
     case "forecast":
@@ -31,9 +31,9 @@ export function foldWeatherChunk(
 }
 
 /** 支持 NDJSON 与 SSE（`data: {...}`）混合格式 */
-export async function* parseWeatherStream(
+export async function* parseMarkdownStream(
   body: ReadableStream<Uint8Array>,
-): AsyncGenerator<WeatherStreamChunk> {
+): AsyncGenerator<MarkdownStreamChunk> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -59,7 +59,7 @@ export async function* parseWeatherStream(
   }
 }
 
-function parseStreamLine(line: string): WeatherStreamChunk | null {
+function parseStreamLine(line: string): MarkdownStreamChunk | null {
   const trimmed = line.trim();
   if (!trimmed) return null;
   if (trimmed.startsWith(":")) return null;
@@ -71,10 +71,10 @@ function parseStreamLine(line: string): WeatherStreamChunk | null {
   }
   if (!payload || payload === "[DONE]") return null;
 
-  return normalizeWeatherPayload(payload);
+  return normalizePayload(payload);
 }
 
-function normalizeWeatherPayload(raw: string): WeatherStreamChunk | null {
+function normalizePayload(raw: string): MarkdownStreamChunk | null {
   try {
     const obj = JSON.parse(raw) as Record<string, unknown>;
     const type = obj.type;

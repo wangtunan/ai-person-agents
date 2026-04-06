@@ -51,7 +51,11 @@ export function ChatShell() {
             {messages.length === 0 ? (
               <ChatEmptyState activeAgent={activeAgent} />
             ) : (
-              <ChatMessageList messages={messages} loading={loading} />
+              <ChatMessageList
+                agentId={activeAgentId}
+                messages={messages}
+                loading={loading}
+              />
             )}
           </div>
 

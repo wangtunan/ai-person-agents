@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChatTurn } from "@/types/chat";
+import type { AgentId, ChatTurn } from "@/types/chat";
 import { cn } from "@/utils/cn";
 import { formatJson } from "@/utils/format-json";
 import { AssistantAvatar, UserAvatar } from "./avatars";
@@ -8,11 +8,12 @@ import { StreamedMarkdown } from "./streamed-markdown";
 import { ThinkingIndicator } from "./thinking-indicator";
 
 type Props = {
+  agentId: AgentId;
   messages: ChatTurn[];
   loading: boolean;
 };
 
-export function ChatMessageList({ messages, loading }: Props) {
+export function ChatMessageList({ agentId, messages, loading }: Props) {
   return (
     <ul className="mx-auto flex w-full max-w-[52rem] flex-col gap-6 px-1 sm:px-0">
       {messages.map((m) => (
@@ -25,7 +26,7 @@ export function ChatMessageList({ messages, loading }: Props) {
               : "items-start justify-start",
           )}
         >
-          {m.role === "assistant" ? <AssistantAvatar /> : null}
+          {m.role === "assistant" ? <AssistantAvatar agentId={agentId} /> : null}
           <div
             className={cn(
               "flex min-w-0 flex-col",
@@ -83,7 +84,7 @@ export function ChatMessageList({ messages, loading }: Props) {
       messages.length > 0 &&
       messages[messages.length - 1]!.role === "user" ? (
         <li className="flex w-full min-w-0 items-start justify-start gap-2.5 sm:gap-3">
-          <AssistantAvatar />
+          <AssistantAvatar agentId={agentId} />
           <div className="min-w-0 max-w-[min(100%,42rem)] flex-1 pt-0.5">
             <ThinkingIndicator />
           </div>

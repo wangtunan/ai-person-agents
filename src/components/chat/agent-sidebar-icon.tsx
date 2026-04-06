@@ -1,9 +1,16 @@
 "use client";
 
 import type { AgentId } from "@/types/chat";
+import { cn } from "@/utils/cn";
 
-export function AgentSidebarIcon({ id }: { id: AgentId }) {
-  const common = "size-[18px] shrink-0 text-[#10a37f]";
+export function AgentSidebarIcon({
+  id,
+  className,
+}: {
+  id: AgentId;
+  className?: string;
+}) {
+  const common = cn("size-[18px] shrink-0 text-[#10a37f]", className);
   switch (id) {
     case "health":
       return (

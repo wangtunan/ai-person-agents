@@ -2,9 +2,9 @@
 
 import { api } from "@/lib/api";
 import { AGENTS } from "@/constants/agents";
+import { useMarkdownStreamChatTurn } from "@/hooks/use-markdown-stream-chat";
 import type { AgentId, ChatTurn } from "@/types/chat";
 import { callAgentApi } from "@/utils/chat-api";
-import { foldWeatherChunk, parseWeatherStream } from "@/utils/weather-stream";
 import { scrollNodeToBottom } from "@/utils/scroll";
 import {
   useCallback,
@@ -28,6 +28,11 @@ export function useChatShell() {
   );
   const [loading, setLoading] = useState(false);
   const messagesScrollRef = useRef<HTMLDivElement>(null);
+
+  const runMarkdownStream = useMarkdownStreamChatTurn(
+    setMessagesByAgent,
+    setLoading,
+  );
 
   const activeAgent = useMemo(
     () => AGENTS.find((a) => a.id === activeAgentId) ?? AGENTS[0]!,
@@ -67,7 +72,7 @@ export function useChatShell() {
     setDraft("");
     setLoading(true);
 
-    if (activeAgentId === "weather") {
+    if (activeAgentId === "weather" || activeAgentId === "vsix") {
       const assistantId = crypto.randomUUID();
       const assistantTurn: ChatTurn = {
         id: assistantId,
@@ -80,47 +85,14 @@ export function useChatShell() {
         [activeAgentId]: [...(prev[activeAgentId] ?? []), assistantTurn],
       }));
 
-      try {
-        const body = await api.weatherStream(text);
-        let acc = "";
-        for await (const chunk of parseWeatherStream(body)) {
-          acc = foldWeatherChunk(acc, chunk);
-          setMessagesByAgent((prev) => {
-            const list = [...(prev[activeAgentId] ?? [])];
-            const idx = list.findIndex((m) => m.id === assistantId);
-            if (idx === -1) return prev;
-            list[idx] = { ...list[idx]!, markdownText: acc, streaming: true };
-            return { ...prev, [activeAgentId]: list };
-          });
-          if (chunk.type === "done") break;
-        }
-      } catch (e) {
-        const message =
-          e instanceof Error ? e.message : "请求失败，请稍后重试。";
-        setMessagesByAgent((prev) => {
-          const list = [...(prev[activeAgentId] ?? [])];
-          const idx = list.findIndex((m) => m.id === assistantId);
-          if (idx === -1) return prev;
-          list[idx] = {
-            ...list[idx]!,
-            errorText: message,
-            streaming: false,
-          };
-          return { ...prev, [activeAgentId]: list };
-        });
-      } finally {
-        setMessagesByAgent((prev) => {
-          const list = [...(prev[activeAgentId] ?? [])];
-          const idx = list.findIndex((m) => m.id === assistantId);
-          if (idx === -1) return prev;
-          if (list[idx]!.streaming) {
-            list[idx] = { ...list[idx]!, streaming: false };
-            return { ...prev, [activeAgentId]: list };
-          }
-          return prev;
-        });
-        setLoading(false);
-      }
+      await runMarkdownStream({
+        activeAgentId,
+        assistantId,
+        getStreamBody:
+          activeAgentId === "weather"
+            ? () => api.weatherStream(text)
+            : () => api.vsixStream(text),
+      });
       return;
     }
 
@@ -150,7 +122,7 @@ export function useChatShell() {
     } finally {
       setLoading(false);
     }
-  }, [activeAgentId, draft, loading, setDraft]);
+  }, [activeAgentId, draft, loading, runMarkdownStream, setDraft]);
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
