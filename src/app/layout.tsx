@@ -25,16 +25,16 @@ export default function RootLayout({
   return (
     <html
       lang="zh-CN"
-      className={`${geistSans.variable} ${geistMono.variable} h-full bg-background font-sans text-foreground antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full overflow-hidden bg-background font-sans text-foreground antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background text-foreground">
+      <body className="flex h-full min-h-0 flex-col overflow-hidden bg-background text-foreground">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
         >
           跳到主要内容
         </a>
-        {children}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
       </body>
     </html>
   );
