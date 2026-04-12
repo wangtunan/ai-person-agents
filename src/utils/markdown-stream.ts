@@ -25,6 +25,8 @@ export function foldMarkdownStreamChunk(
       return acc + chunk.text;
     case "done":
       return chunk.text ? acc + chunk.text : acc;
+    case "error":
+      return acc;
     default:
       return acc;
   }
@@ -86,6 +88,13 @@ function normalizePayload(raw: string): MarkdownStreamChunk | null {
       return {
         type: "done",
         text: typeof t === "string" ? t : "",
+      };
+    }
+    if (type === "error") {
+      const t = obj.text;
+      return {
+        type: "error",
+        text: typeof t === "string" ? t : "请求失败，请稍后重试。",
       };
     }
     if (type === "forecast") {

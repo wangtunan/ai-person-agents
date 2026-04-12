@@ -9,9 +9,9 @@ export async function callAgentApi(
     case "health":
       return api.health();
     case "weather":
-      return api.weather(input);
+      return api.weatherStream(input);
     case "vsix":
-      return api.vsix(input);
+      return api.vsixStream(input);
     case "translate":
       return api.translateStream(input);
     default: {
